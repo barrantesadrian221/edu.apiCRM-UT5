@@ -1,6 +1,8 @@
 package edu.altair.apicrm.entities;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "profesores", schema = "crm")
@@ -11,64 +13,46 @@ public class Profesor {
     @Column(name = "id_profesor")
     private Long idProfesor;
 
+    @Column(name = "dni", nullable = false, unique = true, length = 12)
+    private String dni;
+
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
-    @Column(name = "apellidos", nullable = false, length = 150)
-    private String apellidos;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_departamento", nullable = false, foreignKey = @ForeignKey(name = "fk_profesores_departamento"))
+    private Departamento departamento;
 
-    @Column(name = "modulo", nullable = false, length = 100)
-    private String modulo;
+    @OneToMany(mappedBy = "profesor", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    private List<Asignatura> asignaturas = new ArrayList<>();
 
-    // Constructor vacío por defecto (obligatorio para JPA)
-    public Profesor() {
+    public Profesor() {}
+
+    public Profesor(String dni, String nombre, Departamento departamento) {
+        this.dni = dni;
+        this.nombre = nombre;
+        this.departamento = departamento;
     }
 
-    // Constructor con todos los campos
-    public Profesor(Long idProfesor, String nombre, String apellidos, String modulo) {
-        this.idProfesor = idProfesor;
-        this.nombre = nombre;
-        this.apellidos = apellidos;
-        this.modulo = modulo;
+    public void addAsignatura(Asignatura asignatura) {
+        asignaturas.add(asignatura);
+        asignatura.setProfesor(this);
     }
 
-    // Constructor sin ID (útil para cuando creas registros nuevos antes de que la BD genere el ID)
-    public Profesor(String nombre, String apellidos, String modulo) {
-        this.nombre = nombre;
-        this.apellidos = apellidos;
-        this.modulo = modulo;
+    public void removeAsignatura(Asignatura asignatura) {
+        asignaturas.remove(asignatura);
+        asignatura.setProfesor(null);
     }
 
     // Getters y Setters
-    public Long getIdProfesor() {
-        return idProfesor;
-    }
-
-    public void setIdProfesor(Long idProfesor) {
-        this.idProfesor = idProfesor;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getApellidos() {
-        return apellidos;
-    }
-
-    public void setApellidos(String apellidos) {
-        this.apellidos = apellidos;
-    }
-
-    public String getModulo() {
-        return modulo;
-    }
-
-    public void setModulo(String modulo) {
-        this.modulo = modulo;
-    }
+    public Long getIdProfesor() { return idProfesor; }
+    public void setIdProfesor(Long idProfesor) { this.idProfesor = idProfesor; }
+    public String getDni() { return dni; }
+    public void setDni(String dni) { this.dni = dni; }
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public Departamento getDepartamento() { return departamento; }
+    public void setDepartamento(Departamento departamento) { this.departamento = departamento; }
+    public List<Asignatura> getAsignaturas() { return asignaturas; }
+    public void setAsignaturas(List<Asignatura> asignaturas) { this.asignaturas = asignaturas; }
 }
