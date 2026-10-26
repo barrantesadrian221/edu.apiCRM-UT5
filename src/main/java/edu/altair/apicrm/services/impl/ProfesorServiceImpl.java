@@ -22,7 +22,7 @@ public class ProfesorServiceImpl implements ProfesorService {
     @Override
     @Transactional(readOnly = true)
     public List<ProfesorResponseDto> getProfesoresByModulo(String modulo) {
-        List<Profesor> profesores = profesorRepository.findByModulo(modulo);
+        List<Profesor> profesores = profesorRepository.findByAsignaturasNombreContainingIgnoreCase(modulo);
 
         if (profesores.isEmpty()) {
             throw new ModuloNotFoundException("No se encontraron profesores para el módulo: " + modulo);
@@ -44,7 +44,7 @@ public class ProfesorServiceImpl implements ProfesorService {
     @Override
     @Transactional(readOnly = true)
     public List<ProfesorResponseDto> obtenerPorModulo(String nombreModulo) {
-        List<Profesor> profesores = profesorRepository.findByModulo(nombreModulo);
+        List<Profesor> profesores = profesorRepository.findByAsignaturasNombreContainingIgnoreCase(nombreModulo);
 
         if (profesores.isEmpty()) {
             throw new ModuloNotFoundException("No se encontraron profesores para el módulo: " + nombreModulo);
@@ -55,12 +55,20 @@ public class ProfesorServiceImpl implements ProfesorService {
                 .toList();
     }
 
+    /**
+     * Mapea la entidad Profesor al DTO de respuesta adaptado a la UT5.
+     */
     private ProfesorResponseDto mapToResponseDto(Profesor profesor) {
+        // Obtenemos el nombre del departamento de forma segura si existe
+        String nombreDepartamento = (profesor.getDepartamento() != null)
+                ? profesor.getDepartamento().getNombre()
+                : "Sin departamento";
+
         return new ProfesorResponseDto(
                 profesor.getIdProfesor(),
+                profesor.getDni(),
                 profesor.getNombre(),
-                profesor.getApellidos(),
-                profesor.getModulo()
+                nombreDepartamento
         );
     }
 }
