@@ -1,0 +1,9 @@
+
+### 1. Consultar profesores de un módulo existente (HTTP 200 OK)
+GET http://localhost:8080/api/profesores/modulo/AccesoADatos
+
+### 2. Probar módulo sin profesores (Devuelve HTTP 404 Not Found con JSON ProblemDetail)
+GET http://localhost:8080/api/profesores/modulo/ModuloInexistente
+
+### Obtener todos los profesores
+GET http://localhost:8080/api/profesores
